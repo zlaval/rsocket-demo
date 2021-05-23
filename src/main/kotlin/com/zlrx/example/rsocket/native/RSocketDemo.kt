@@ -46,14 +46,20 @@ class SocketAcceptorImpl : SocketAcceptor {
             MathService()
         }
     }
-
 }
-
 
 class MathService : RSocket {
 
     override fun fireAndForget(payload: Payload): Mono<Void> {
         println(fromPayload<Request>(payload))
         return Mono.empty()
+    }
+
+    override fun requestResponse(payload: Payload): Mono<Payload> {
+        return Mono.fromSupplier {
+            val request: Request = fromPayload(payload)
+            val response = Response(request.input, request.input * 10)
+            toPayload(response)
+        }
     }
 }

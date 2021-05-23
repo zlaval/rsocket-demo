@@ -6,7 +6,7 @@ import io.rsocket.util.DefaultPayload
 import org.junit.jupiter.api.Test
 import reactor.test.StepVerifier
 
-class FireForgetTest {
+class RSocketDemoTest {
 
     private val rSocket = RSocketConnector.create()
         .connect(TcpClientTransport.create("localhost", 6555))
@@ -27,6 +27,16 @@ class FireForgetTest {
         val stream = rSocket.fireAndForget(message)
 
         StepVerifier.create(stream)
+            .verifyComplete()
+    }
+
+    @Test
+    fun `request response`() {
+        val request = toPayload(Request(10))
+        val result = rSocket.requestResponse(request).map { fromPayload<Response>(it) }
+        StepVerifier.create(result)
+            .expectSubscription()
+            .expectNext(Response(10, 100))
             .verifyComplete()
     }
 
