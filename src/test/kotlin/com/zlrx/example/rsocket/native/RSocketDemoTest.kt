@@ -40,4 +40,14 @@ class RSocketDemoTest {
             .verifyComplete()
     }
 
+    @Test
+    fun `request stream`() {
+        val request = toPayload(Request(10))
+        val result = rSocket.requestStream(request).map { fromPayload<Response>(it) }
+        StepVerifier.create(result)
+            .expectSubscription()
+            .expectNextCount(10)
+            .verifyComplete()
+    }
+
 }

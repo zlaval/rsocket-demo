@@ -8,7 +8,9 @@ import io.rsocket.SocketAcceptor
 import io.rsocket.core.RSocketServer
 import io.rsocket.transport.netty.server.TcpServerTransport
 import io.rsocket.util.DefaultPayload
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import java.time.Duration
 
 fun main() {
     val server = RSocketServer.create(SocketAcceptorImpl())
@@ -17,7 +19,6 @@ fun main() {
 }
 
 val objectMapper = jacksonObjectMapper()
-
 
 data class Request(
     val input: Int
@@ -43,12 +44,12 @@ class SocketAcceptorImpl : SocketAcceptor {
     override fun accept(setup: ConnectionSetupPayload, sendingSocket: RSocket): Mono<RSocket> {
         println("Accept")
         return Mono.fromCallable {
-            MathService()
+            RSocketService()
         }
     }
 }
 
-class MathService : RSocket {
+class RSocketService : RSocket {
 
     override fun fireAndForget(payload: Payload): Mono<Void> {
         println(fromPayload<Request>(payload))
@@ -61,5 +62,17 @@ class MathService : RSocket {
             val response = Response(request.input, request.input * 10)
             toPayload(response)
         }
+    }
+
+    override fun requestStream(payload: Payload): Flux<Payload> {
+        val request: Request = fromPayload(payload)
+        return Flux.range(1, 10)
+            .map {
+                request.input * it
+            }.map {
+                Response(request.input, it)
+            }.delayElements(Duration.ofSeconds(1))
+            .map { toPayload(it) }
+            .doOnNext { println(it) }
     }
 }
