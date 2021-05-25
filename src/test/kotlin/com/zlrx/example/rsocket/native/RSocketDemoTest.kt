@@ -4,7 +4,9 @@ import io.rsocket.core.RSocketConnector
 import io.rsocket.transport.netty.client.TcpClientTransport
 import io.rsocket.util.DefaultPayload
 import org.junit.jupiter.api.Test
+import reactor.core.publisher.Flux
 import reactor.test.StepVerifier
+import java.time.Duration
 
 class RSocketDemoTest {
 
@@ -47,6 +49,24 @@ class RSocketDemoTest {
         StepVerifier.create(result)
             .expectSubscription()
             .expectNextCount(10)
+            .verifyComplete()
+    }
+
+    @Test
+    fun `request channel`() {
+        val publisher = Flux.range(-10, 21)
+            .map { Request(it) }
+            .delayElements(Duration.ofMillis(200))
+            .map { toPayload(it) }
+
+        val result = rSocket.requestChannel(publisher).map { fromPayload<ChartResponse>(it) }
+            .doOnNext {
+                println(it)
+            }
+
+        StepVerifier.create(result)
+            .expectSubscription()
+            .expectNextCount(21)
             .verifyComplete()
     }
 

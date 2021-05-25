@@ -1,0 +1,9 @@
+<configuration>
+    <logger name="io.netty">
+        <level value="info"/>
+    </logger>
+
+    <root level="off">
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>

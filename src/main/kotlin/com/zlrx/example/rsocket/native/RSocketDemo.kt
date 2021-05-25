@@ -8,6 +8,7 @@ import io.rsocket.SocketAcceptor
 import io.rsocket.core.RSocketServer
 import io.rsocket.transport.netty.server.TcpServerTransport
 import io.rsocket.util.DefaultPayload
+import org.reactivestreams.Publisher
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.time.Duration
@@ -29,6 +30,19 @@ data class Response(
     val output: Int
 )
 
+data class ChartResponse(
+    val input: Int,
+    val output: Int
+) {
+    private fun getFormat(value: Int): String {
+        return "%3s|%${value}s"
+    }
+
+    override fun toString(): String {
+        return String.format(getFormat(output), input, "X")
+    }
+}
+
 fun <T> toPayload(obj: T): Payload {
     val bytes = objectMapper.writeValueAsBytes(obj)
     return DefaultPayload.create(bytes)
@@ -42,7 +56,6 @@ inline fun <reified T> fromPayload(payload: Payload): T {
 class SocketAcceptorImpl : SocketAcceptor {
 
     override fun accept(setup: ConnectionSetupPayload, sendingSocket: RSocket): Mono<RSocket> {
-        println("Accept")
         return Mono.fromCallable {
             RSocketService()
         }
@@ -74,5 +87,15 @@ class RSocketService : RSocket {
             }.delayElements(Duration.ofSeconds(1))
             .map { toPayload(it) }
             .doOnNext { println(it) }
+    }
+
+    override fun requestChannel(payloads: Publisher<Payload>): Flux<Payload> {
+        return Flux.from(payloads)
+            .map {
+                val request = fromPayload<Request>(it)
+                val input: Int = request.input
+                val result = ChartResponse(input, input * input + 1)
+                toPayload(result)
+            }
     }
 }
