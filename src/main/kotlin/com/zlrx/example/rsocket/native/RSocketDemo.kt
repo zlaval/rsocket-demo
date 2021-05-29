@@ -12,11 +12,17 @@ import org.reactivestreams.Publisher
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.time.Duration
+import kotlin.math.pow
 
 fun main() {
     val server = RSocketServer.create(SocketAcceptorImpl())
     val channel = server.bindNow(TcpServerTransport.create(6555))
+
+    val batchServer = RSocketServer.create(BatchSocketAcceptorImpl())
+    val batchChannel = batchServer.bindNow(TcpServerTransport.create(6666))
+
     channel.onClose().block()
+
 }
 
 val objectMapper = jacksonObjectMapper()
@@ -98,4 +104,40 @@ class RSocketService : RSocket {
                 toPayload(result)
             }
     }
+}
+
+class BatchSocketAcceptorImpl : SocketAcceptor {
+
+    override fun accept(setup: ConnectionSetupPayload, sendingSocket: RSocket): Mono<RSocket> {
+        return Mono.fromCallable {
+            BatchJob(sendingSocket)
+        }
+    }
+}
+
+class BatchJob(
+    private val rSocket: RSocket
+) : RSocket {
+
+    override fun fireAndForget(payload: Payload): Mono<Void> {
+        val request = fromPayload<Request>(payload)
+        println(request)
+
+        Mono.just(request)
+            .delayElement(Duration.ofSeconds(3))
+            .doOnNext { println("Emmit $it") }
+            .flatMap { findCube(it) }
+            .subscribe()
+
+        return Mono.empty()
+    }
+
+    private fun findCube(request: Request): Mono<Void> {
+        val output = request.input.toDouble().pow(3)
+        val response = Response(request.input, output.toInt())
+        val payload = toPayload(response)
+        return rSocket.fireAndForget(payload)
+    }
+
+
 }
