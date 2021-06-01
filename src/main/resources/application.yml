@@ -2,3 +2,6 @@ spring:
   rsocket:
     server:
       port: 6555
+logging:
+  level:
+    com: INFO

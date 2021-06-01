@@ -35,6 +35,15 @@ class ComputationTest {
     }
 
     @Test
+    fun testPrintInput() {
+        val result = requester.route("computation.fire-and-forget.15")
+            .data(ComputationRequest(10))
+            .send()
+        StepVerifier.create(result)
+            .verifyComplete()
+    }
+
+    @Test
     fun testRequestResponse() {
         val result = requester.route("computation.request-response")
             .data(ComputationRequest(10))

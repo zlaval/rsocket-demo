@@ -27,4 +27,8 @@ class ComputationService {
 
     suspend fun requestChannel(stream: Flow<ComputationRequest>) = stream.map { ComputationResponse(it.input, it.input.times(it.input)) }
 
+    suspend fun printInput(input: Int) {
+        logger.info("$input")
+    }
+
 }
