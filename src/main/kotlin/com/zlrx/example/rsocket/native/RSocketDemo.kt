@@ -68,7 +68,7 @@ class SocketAcceptorImpl : SocketAcceptor {
     }
 }
 
-class RSocketService : RSocket {
+open class RSocketService : RSocket {
 
     override fun fireAndForget(payload: Payload): Mono<Void> {
         println(fromPayload<Request>(payload))
