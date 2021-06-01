@@ -1,2 +1,4 @@
-logging:
-  level: off
+spring:
+  rsocket:
+    server:
+      port: 6555
