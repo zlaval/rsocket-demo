@@ -79,4 +79,21 @@ class ComputationTest {
             .verifyComplete()
     }
 
+    @Test
+    fun testInputValidation() {
+//        val result = requester.route("computation.validate-input.10")
+//            .retrieveMono(Int::class.java)
+//        StepVerifier.create(result)
+//            .verifyError(ApplicationErrorException::class.java)
+
+        val result2 = requester.route("computation.validate-input.9")
+            .retrieveMono(Int::class.java)
+            .doOnNext {
+                println(it)
+            }
+        StepVerifier.create(result2)
+            .expectNextCount(1)
+            .verifyComplete()
+    }
+
 }

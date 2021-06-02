@@ -4,6 +4,7 @@ import com.zlrx.example.rsocket.domain.ComputationRequest
 import com.zlrx.example.rsocket.service.ComputationService
 import kotlinx.coroutines.flow.Flow
 import org.springframework.messaging.handler.annotation.DestinationVariable
+import org.springframework.messaging.handler.annotation.MessageExceptionHandler
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.stereotype.Controller
 
@@ -27,5 +28,16 @@ class ComputationRouter(
 
     @MessageMapping("fire-and-forget.{input}")
     suspend fun processInput(@DestinationVariable input: Int) = service.printInput(input)
+
+    @MessageMapping("validate-input.{input}")
+    suspend fun validateInput(@DestinationVariable input: Int) = if (input < 10) {
+        input * 2
+    } else {
+        throw IllegalArgumentException("Input must be less than 10")
+    }
+
+    @MessageExceptionHandler
+    suspend fun exceptionHandler(exception: Exception): Int = 777
+
 
 }
