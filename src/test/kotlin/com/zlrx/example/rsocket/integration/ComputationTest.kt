@@ -1,7 +1,7 @@
 package com.zlrx.example.rsocket.integration
 
-import com.zlrx.example.rsocket.domain.ComputationRequest
-import com.zlrx.example.rsocket.domain.ComputationResponse
+import com.zlrx.example.rsocket.model.ComputationRequest
+import com.zlrx.example.rsocket.model.ComputationResponse
 import io.rsocket.transport.netty.client.TcpClientTransport
 import kotlinx.coroutines.flow.flow
 import org.junit.jupiter.api.BeforeEach
@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.messaging.rsocket.RSocketRequester
+import org.springframework.messaging.rsocket.annotation.support.RSocketMessageHandler
 import reactor.test.StepVerifier
 
 @SpringBootTest
@@ -17,11 +18,18 @@ class ComputationTest {
     @Autowired
     private lateinit var rSocketBuilder: RSocketRequester.Builder
 
+    @Autowired
+    private lateinit var handler: RSocketMessageHandler
+
     private lateinit var requester: RSocketRequester
 
     @BeforeEach
     fun init() {
-        requester = rSocketBuilder.transport(TcpClientTransport.create("localhost", 6555))
+        requester = rSocketBuilder
+            .rsocketConnector {
+                it.acceptor(handler.responder())
+            }
+            .transport(TcpClientTransport.create("localhost", 6555))
     }
 
 

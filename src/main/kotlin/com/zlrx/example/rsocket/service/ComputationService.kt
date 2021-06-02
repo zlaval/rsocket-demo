@@ -1,7 +1,7 @@
 package com.zlrx.example.rsocket.service
 
-import com.zlrx.example.rsocket.domain.ComputationRequest
-import com.zlrx.example.rsocket.domain.ComputationResponse
+import com.zlrx.example.rsocket.model.ComputationRequest
+import com.zlrx.example.rsocket.model.ComputationResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
