@@ -2,6 +2,7 @@ package com.zlrx.example.rsocket.integration
 
 import com.zlrx.example.rsocket.model.ComputationRequest
 import com.zlrx.example.rsocket.model.ComputationResponse
+import io.rsocket.core.Resume
 import io.rsocket.transport.netty.client.TcpClientTransport
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -22,7 +23,15 @@ class ConnectionRetryTest {
     @Test
     fun testConnectionRetry() {
         val requester = rSocketBuilder
-            .rsocketConnector { it.reconnect(Retry.fixedDelay(10, Duration.ofSeconds(2)).doBeforeRetry { println("Retry") }) }
+            .rsocketConnector {
+                it
+                    .reconnect(
+                        Retry.fixedDelay(10, Duration.ofSeconds(2)).doBeforeRetry { tr -> println("Retry ${tr.totalRetries()}") }
+                    )
+                    .resume(
+                        Resume().retry(Retry.backoff(100, Duration.ofSeconds(1)).doBeforeRetry { tr -> println("Resume ${tr.totalRetries()}") })
+                    )
+            }
             .transport(TcpClientTransport.create("localhost", 6555))
 
         for (i in 0..50) {
