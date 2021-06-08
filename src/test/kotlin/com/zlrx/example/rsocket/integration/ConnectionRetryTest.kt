@@ -3,12 +3,15 @@ package com.zlrx.example.rsocket.integration
 import com.zlrx.example.rsocket.model.ComputationRequest
 import com.zlrx.example.rsocket.model.ComputationResponse
 import io.rsocket.core.Resume
+import io.rsocket.loadbalance.LoadbalanceTarget
+import io.rsocket.loadbalance.RoundRobinLoadbalanceStrategy
 import io.rsocket.transport.netty.client.TcpClientTransport
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.messaging.rsocket.RSocketRequester
 import org.springframework.test.context.TestPropertySource
+import reactor.core.publisher.Flux
 import reactor.test.StepVerifier
 import reactor.util.retry.Retry
 import java.time.Duration
@@ -19,6 +22,15 @@ class ConnectionRetryTest {
 
     @Autowired
     private lateinit var rSocketBuilder: RSocketRequester.Builder
+
+    @Autowired
+    private lateinit var clients: Flux<List<LoadbalanceTarget>>
+
+    //@Test
+    fun loadBalanceTest() {
+        val requester = rSocketBuilder.transports(clients, RoundRobinLoadbalanceStrategy()) //WeightedLoadbalanceStrategy for zones
+        //TODO test
+    }
 
     @Test
     fun testConnectionRetry() {
