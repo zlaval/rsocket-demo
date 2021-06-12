@@ -8,15 +8,16 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.messaging.rsocket.RSocketRequester
 
+
 @SpringBootTest
 class ConnectionSetupExample {
 
     @Autowired
     private lateinit var rSocketBuilder: RSocketRequester.Builder
 
-    //   private lateinit var requester: RSocketRequester
-
-
+//    private lateinit var requester: RSocketRequester
+//
+//
 //    @BeforeEach
 //    fun init() {
 //        val request = ClientConnectionRequest("my-id", "password")
@@ -28,6 +29,36 @@ class ConnectionSetupExample {
 //
 //    @Test
 //    fun testConnection() {
+//        val response = requester.route("computation.request-response")
+//            .data(ComputationRequest(10))
+//            .retrieveMono(ComputationResponse::class.java)
+//            .doOnNext { println(it) }
+//
+//        StepVerifier.create(response)
+//            .expectNextCount(1)
+//            .verifyComplete()
+//    }
+
+
+//    companion object {
+//        init {
+//            System.setProperty("javax.net.ssl.trustStore", "/ssl/client.truststore")
+//            System.setProperty("javax.net.ssl.trustStorePassword", "password")
+//        }
+//    }
+//
+//    @Test
+//    fun testSSLConnection() {
+//        val requester = rSocketBuilder
+//            .transport(
+//                TcpClientTransport.create(
+//                    TcpClient.create()
+//                        .host("localhost")
+//                        .port(6555)
+//                        .secure()
+//                )
+//            )
+//
 //        val response = requester.route("computation.request-response")
 //            .data(ComputationRequest(10))
 //            .retrieveMono(ComputationResponse::class.java)

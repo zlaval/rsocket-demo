@@ -2,6 +2,12 @@ spring:
   rsocket:
     server:
       port: 6555
+#      ssl:
+#        enabled: true
+#        key-store-type: PKCS12
+#        key-store: /ssl/rsocket-server.pk
+#        key-store-password: password
+#        key-alias: rsocket_key
 logging:
   level:
     com: INFO
