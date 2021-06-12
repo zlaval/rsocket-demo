@@ -31,7 +31,9 @@ class SecuredTest {
 
     @Test
     fun testRequestResponse() {
+        val metadata = UsernamePasswordMetadata("user", "password")
         val result = requester.route("secured.request-response")
+            .metadata(metadata, MimeTypeUtils.parseMimeType(WellKnownMimeType.MESSAGE_RSOCKET_AUTHENTICATION.string))
             .data(ComputationRequest(10))
             .retrieveMono(ComputationResponse::class.java)
         StepVerifier.create(result)
@@ -41,7 +43,9 @@ class SecuredTest {
 
     @Test
     fun testRequestStream() {
+        val metadata = UsernamePasswordMetadata("admin", "password")
         val result = requester.route("secured.request-stream")
+            .metadata(metadata, MimeTypeUtils.parseMimeType(WellKnownMimeType.MESSAGE_RSOCKET_AUTHENTICATION.string))
             .data(ComputationRequest(10))
             .retrieveFlux(ComputationResponse::class.java)
         StepVerifier.create(result)
