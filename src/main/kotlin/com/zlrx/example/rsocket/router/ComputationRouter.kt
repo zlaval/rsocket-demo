@@ -15,7 +15,6 @@ class ComputationRouter(
     private val service: ComputationService
 ) {
 
-
     @MessageMapping("fire-and-forget")
     suspend fun callFireAndForget(request: ComputationRequest) = service.fireAndForget(request)
 

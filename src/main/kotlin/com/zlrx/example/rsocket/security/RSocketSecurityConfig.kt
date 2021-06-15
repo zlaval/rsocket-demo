@@ -1,5 +1,6 @@
 package com.zlrx.example.rsocket.security
 
+import io.rsocket.metadata.WellKnownMimeType
 import org.springframework.boot.rsocket.messaging.RSocketStrategiesCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -12,6 +13,7 @@ import org.springframework.security.config.annotation.rsocket.RSocketSecurity
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.messaging.handler.invocation.reactive.AuthenticationPrincipalArgumentResolver
 import org.springframework.security.rsocket.metadata.SimpleAuthenticationEncoder
+import org.springframework.util.MimeTypeUtils
 
 @Configuration
 @EnableRSocketSecurity
@@ -24,6 +26,9 @@ class RSocketSecurityConfig {
     @Bean
     fun strategyCustomizer(): RSocketStrategiesCustomizer = RSocketStrategiesCustomizer {
         it.encoder(SimpleAuthenticationEncoder())
+            .metadataExtractorRegistry { m ->
+                m.metadataToExtract(MimeTypeUtils.parseMimeType(WellKnownMimeType.APPLICATION_CBOR.name), String::class.java, "operation-type")
+            }
     }
 
     @Bean

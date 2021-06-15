@@ -34,6 +34,7 @@ class SecuredTest {
         val metadata = UsernamePasswordMetadata("user", "password")
         val result = requester.route("secured.request-response")
             .metadata(metadata, MimeTypeUtils.parseMimeType(WellKnownMimeType.MESSAGE_RSOCKET_AUTHENTICATION.string))
+            .metadata("get-operation", MimeTypeUtils.parseMimeType(WellKnownMimeType.APPLICATION_CBOR.name))
             .data(ComputationRequest(10))
             .retrieveMono(ComputationResponse::class.java)
         StepVerifier.create(result)
